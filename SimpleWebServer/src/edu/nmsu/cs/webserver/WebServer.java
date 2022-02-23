@@ -17,17 +17,15 @@ package edu.nmsu.cs.webserver;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class WebServer
-{
-	private ServerSocket	socket;
-
-	private boolean				running;
+public class WebServer{
+	
+	private ServerSocket socket;
+	private boolean running;
 
 	/**
 	 * Constructor
 	 **/
-	private WebServer()
-	{
+	private WebServer(){
 		running = false;
 	}
 
@@ -38,28 +36,23 @@ public class WebServer
 	 * @param port
 	 *          is the TCP port number to accept connections on
 	 **/
-	private boolean start(int port)
-	{
+	private boolean start(int port){
+		
 		Socket workerSocket;
 		WebWorker worker;
-		try
-		{
+		try{
 			socket = new ServerSocket(port);
 		}
-		catch (Exception e)
-		{
+		catch (Exception e){
 			System.err.println("Error binding to port " + port + ": " + e);
 			return false;
 		}
-		while (true)
-		{
-			try
-			{
+		while (true){
+			try{
 				// wait and listen for new client connection
 				workerSocket = socket.accept();
 			}
-			catch (Exception e)
-			{
+			catch (Exception e){
 				System.err.println("No longer accepting: " + e);
 				break;
 			}
@@ -73,8 +66,7 @@ public class WebServer
 	/**
 	 * Does not do anything, since start() never returns.
 	 **/
-	private boolean stop()
-	{
+	private boolean stop(){
 		return true;
 	}
 
@@ -82,8 +74,7 @@ public class WebServer
 	 * Application main: process command line and start web server; default port number is 8080 if not
 	 * given on command line.
 	 **/
-	public static void main(String args[])
-	{
+	public static void main(String args[]){
 		int port = 8080;
 		if (args.length > 1)
 		{
@@ -107,6 +98,7 @@ public class WebServer
 		{
 			System.err.println("Execution failed!");
 		}
+		
 	} // end main
 
 } // end class

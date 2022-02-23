@@ -1,5 +1,7 @@
 package edu.nmsu.cs.webserver;
 
+import java.io.BufferedInputStream;
+
 /**
  * Web worker: an object of this class executes in its own new thread to receive and respond to a
  * single HTTP request. After the constructor the object executes on its "run" method, and leaves
@@ -22,6 +24,10 @@ package edu.nmsu.cs.webserver;
  **/
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -30,8 +36,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class WebWorker implements Runnable
-{
+public class WebWorker implements Runnable{
 
 	private Socket socket;
 
@@ -42,7 +47,7 @@ public class WebWorker implements Runnable
 	{
 		socket = s;
 	}
-
+	
 	/**
 	 * Worker thread starting point. Each worker handles just one HTTP request and then returns, which
 	 * destroys the thread. This method assumes that whoever created the worker created it with a
@@ -55,9 +60,21 @@ public class WebWorker implements Runnable
 		{
 			InputStream is = socket.getInputStream();
 			OutputStream os = socket.getOutputStream();
-			readHTTPRequest(is);
-			writeHTTPHeader(os, "text/html");
-			writeContent(os);
+			//add things in the next 3 lines
+			String filename = readHTTPRequest(is);
+			File reqFile = new File(filename);
+			
+			if(reqFile.getName().toLowerCase().endsWith("html")){
+				writeHTTPHeader(os, reqFile, "text/html");
+				writeContent(os, reqFile);
+			}else if(reqFile.getName().toLowerCase().endsWith("png")) {
+				writeHTTPHeader(os, reqFile, "image/png");
+				writeContent(os, reqFile);
+			}else if(reqFile.getName().toLowerCase().endsWith("jpg") || reqFile.getName().toLowerCase().endsWith("jpeg")){
+				writeHTTPHeader(os, reqFile, "image/jpeg");
+				writeContent(os, reqFile);
+			}
+			
 			os.flush();
 			socket.close();
 		}
@@ -72,17 +89,27 @@ public class WebWorker implements Runnable
 	/**
 	 * Read the HTTP request header.
 	 **/
-	private void readHTTPRequest(InputStream is)
-	{
+	private String readHTTPRequest(InputStream is){
+		int h = 0;
 		String line;
+		String reqFileName = null;
 		BufferedReader r = new BufferedReader(new InputStreamReader(is));
-		while (true)
-		{
-			try
-			{
+		while (true){
+			try{
+				//do file read or string parsing 
 				while (!r.ready())
 					Thread.sleep(1);
 				line = r.readLine();
+				
+				if(h == 0) {//returns file request string
+					reqFileName = line;
+					reqFileName = reqFileName.substring(5, reqFileName.length()-9);
+					System.out.println(reqFileName);
+				    h = 1;
+				}if(line.length() == 0) {
+					break;
+				}
+				
 				System.err.println("Request line: (" + line + ")");
 				if (line.length() == 0)
 					break;
@@ -93,7 +120,7 @@ public class WebWorker implements Runnable
 				break;
 			}
 		}
-		return;
+		return reqFileName;
 	}
 
 	/**
@@ -104,12 +131,12 @@ public class WebWorker implements Runnable
 	 * @param contentType
 	 *          is the string MIME content type (e.g. "text/html")
 	 **/
-	private void writeHTTPHeader(OutputStream os, String contentType) throws Exception
+	private void writeHTTPHeader(OutputStream os, File reqFile, String contentType) throws Exception
 	{
 		Date d = new Date();
 		DateFormat df = DateFormat.getDateTimeInstance();
 		df.setTimeZone(TimeZone.getTimeZone("GMT"));
-		os.write("HTTP/1.1 200 OK\n".getBytes());
+		os.write("HTTP/1.1 404 Not Found\n".getBytes());
 		os.write("Date: ".getBytes());
 		os.write((df.format(d)).getBytes());
 		os.write("\n".getBytes());
@@ -130,11 +157,31 @@ public class WebWorker implements Runnable
 	 * @param os
 	 *          is the OutputStream object to write to
 	 **/
-	private void writeContent(OutputStream os) throws Exception
+	private void writeContent(OutputStream os, File reqFile) //throws Exception
 	{
-		os.write("<html><head></head><body>\n".getBytes());
-		os.write("<h3>My web server works!</h3>\n".getBytes());
-		os.write("</body></html>\n".getBytes());
+		if(reqFile.exists()) {
+			BufferedInputStream reqFileStream;
+			try {
+				reqFileStream = new BufferedInputStream(new FileInputStream(reqFile));
+				int readByte;
+				readByte = reqFileStream.read();
+				while(readByte != -1) {
+					os.write(readByte);
+					readByte = reqFileStream.read();
+				}
+			reqFileStream.close();	
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
+	}
+		//os.write("<html><head></head><body>\n".getBytes());
+		//os.write("<h3>My web server works!</h3>\n".getBytes());
+		//os.write("</body></html>\n".getBytes());
+	
 
 } // end class
