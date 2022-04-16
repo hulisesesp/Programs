@@ -23,6 +23,7 @@ package edu.nmsu.cs.webserver;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -41,8 +42,7 @@ public class WebWorker implements Runnable{
 	/**
 	 * Constructor: must have a valid open socket
 	 **/
-	public WebWorker(Socket s)
-	{
+	public WebWorker(Socket s){
 		socket = s;
 	}
 	
@@ -51,8 +51,7 @@ public class WebWorker implements Runnable{
 	 * destroys the thread. This method assumes that whoever created the worker created it with a
 	 * valid open socket object.
 	 **/
-	public void run()
-	{
+	public void run(){
 		System.err.println("Handling connection...");
 		try
 		{
@@ -65,6 +64,21 @@ public class WebWorker implements Runnable{
 			if(reqFile.getName().toLowerCase().endsWith("html")){
 				writeHTTPHeader(os, reqFile, "text/html");
 				writeContent(os, reqFile, "text/html");
+			}
+			
+			if(reqFile.getName().toLowerCase().endsWith("png")){
+				writeHTTPHeader(os, reqFile, "image/png");
+				writeContent(os, reqFile, "image/png");
+			}
+			
+			if(reqFile.getName().toLowerCase().endsWith("gif")){
+				writeHTTPHeader(os, reqFile, "image/gif");
+				writeContent(os, reqFile, "image/gif");
+			}
+			
+			if(reqFile.getName().toLowerCase().endsWith("jpeg") || reqFile.getName().toLowerCase().endsWith("jpg")){
+				writeHTTPHeader(os, reqFile, "image/jpeg");
+				writeContent(os, reqFile, "image/jpeg");
 			}
 			
 			os.flush();
@@ -105,15 +119,13 @@ public class WebWorker implements Runnable{
 				System.err.println("Request line: (" + line + ")");
 				if (line.length() == 0)
 					break;
-			}
-			catch (Exception e)
-			{
+			}catch (Exception e){
 				System.err.println("Request error: " + e);
 				return "404";
-				
 			}
+			
 		}
-		return reqFileName;
+		return "www/" + reqFileName;
 	}
 
 	/**
@@ -135,10 +147,9 @@ public class WebWorker implements Runnable{
 			}//end catch
 
 			if(flag == 0){
-			os.write("HTTP/1.1 200 OK\n".getBytes());   
-			}
-			else {
-			os.write("HTTP/1.1 404 Not Found\n".getBytes());
+				os.write("HTTP/1.1 200 OK\n".getBytes());   
+			}else{
+				os.write("HTTP/1.1 404 Not Found\n".getBytes());
 			}
 
 			os.write("Date: ".getBytes());
@@ -168,6 +179,7 @@ public class WebWorker implements Runnable{
 	    String address = reqFile.toString();
 	    String date = dformat.format(d);
 	    
+	    if(contentType == "text/html") {
 	      try{
 	         FileReader fRead = new FileReader(reqFile);
 
@@ -179,7 +191,6 @@ public class WebWorker implements Runnable{
 	        	 if(i==4) {
 	        	 h = fcont;
 	        	 }
-
 	              i++;
 	         }
 	         String target = "<cs371date>";
@@ -194,8 +205,22 @@ public class WebWorker implements Runnable{
 	      }catch(FileNotFoundException e) {
 	         System.err.println("File not found: " + address);
 	         os.write("HTTP/1.1 404 Not Found\n".getBytes());
-	      } 
+	      }
+	    }else {
+			FileInputStream f = new FileInputStream(reqFile);
+			int j = f.available();
+			//use array to store the data
+			byte[] B = new byte[j];
+			f.read(B);
+			f.close();
+			os.write(B);
+	    }
+	    
+
 	      
-	   }  
+	    
+	    
+	    
+	}  
 }
 
