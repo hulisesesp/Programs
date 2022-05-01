@@ -1,82 +1,65 @@
-<project name="circle" basedir=".">
+<project name="Circles" default="cleancompile" basedir=".">
+    <description>
+        Buildfile for Circles
+    </description>
+    <property name ="src.dir" location = "src/"/>
+    <property name ="build.dir" location ="bin/"/>
+    <property name="library.dir" location="lib/"/>
 
-	<property name="src.dir" location="src/" />
-	<property name="build.dir" location="bin/" />
-	<property name="lib.dir" location="lib/" />
-	<property name="result.dir" location="./target" />
+    <target name = "clean" description="deletes all class files">
+        <delete>
+            <fileset dir="." includes="**/*.class" />
+        </delete>
+    </target>
 
-	
+    <target name="compile" description="compiles all java files to /bin">
+        <mkdir dir="${build.dir}" />
+        <javac srcdir="${src.dir}" destdir="${build.dir}">
+            <classpath>
+                <fileset dir="${library.dir}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
 
-<!--CLEAN COMPILE AND RUN -->
+    <target name="cleancompile" depends="clean,compile"/>
 
-	<!-- standard compile task, but turn debugging on for source viewing -->
-	<target name="compile" description="compile the source">
-		<mkdir dir="${build.dir}" />
-		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true">
-			<classpath>
-				<fileset dir="${lib.dir}">
-					<include name="**/*.jar"/>
-				</fileset>
-			</classpath>
-		</javac>
-	</target>
+    <target name="run" description="launches CircleRun with some default values">
+        <java classname="edu.nmsu.cs.circles.CircleRun" classpath="${build.dir}" fork="true" dir="${basedir}">
+            <arg value="0" />
+            <arg value="0" />
+            <arg value="5" />
+            <arg value="5" />
+            <arg value="5" />
+            <arg value="10" />
+        </java>
+    </target>
 
-	
+    <target name="testCircle1" description="runs JUnit on Circle1Test">
+        <java classname="org.junit.runner.JUnitCore" fork="true" dir="${basedir}">
+            <classpath>
+                <fileset dir="${library.dir}">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <pathelement path="${build.dir}"/>
+            </classpath>
+            <arg value="edu.nmsu.cs.circles.Circle1Test" />
+        </java>
+    </target>
 
-	<!-- clean up by removing all generated files; do "ant clean" to start afresh -->
-	<target name="clean">
-		<delete>
-			<fileset dir="." includes="**/*.class **/junit.exec" />
-		</delete>
-		<delete dir="${result.report.dir}" />
-	</target>
+    <target name = "testCircle2" description="runs JUnit on Circle2Test">
+        <java classname = "org.junit.runner.JUnitCore" fork="true" dir="${basedir}">
+            <classpath>
+                <fileset dir="${library.dir}">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <pathelement path="${build.dir}"/>
+            </classpath>
+            <arg value="edu.nmsu.cs.circles.Circle2Test"/>
+        </java>
+    </target>
 
-	<!-- run -->
-	<target name="run" depends="compile" description="runs CircleRun">
-		<java classname="edu.nmsu.cs.circles.CircleRun" classpath="bin/" fork="true" dir="${basedir}">
-			<arg value="0"/>
-			<arg value="0"/>
-			<arg value="5"/>
-			<arg value="5"/>
-			<arg value="5"/>
-			<arg value="10"/>
-		</java>
-	</target>
-	
-	
-
-<!-- junit testing-->
-	<target name="testCircle1" depends="compile">
-		<junit>
-			<classpath location="test.path" />
-			<classpath location="${build.dir}" />
-			<classpath location="lib/hamcrest-core-1.3.jar" />
-			<classpath location="lib/junit-4.13.1.jar" />
-
-			<test name = "edu.nmsu.cs.circles.Circle1Test" />
-			
-			
-			<formatter type="brief" usefile="false" />
-		</junit>
-	</target>
-
-	<target name="testCircle2" depends="compile">
-		<junit>
-			<classpath location="test.path" />
-			<classpath location="${build.dir}" />
-			<classpath location="lib/hamcrest-core-1.3.jar" />
-			<classpath location="lib/junit-4.13.1.jar" />
-
-			<test name = "edu.nmsu.cs.circles.Circle2Test" />
-			<formatter type="plain" usefile="false" />
-		</junit>
-	</target>
-
-	<target name="test" depends="testCircle1, testCircle2">
-		
-	</target>
-			
-
-
-
+    <target name="test" depends="testCircle1,testCircle2" description="runs JUnit on both testCircle1 and testCircle2"/>
+        
 </project>

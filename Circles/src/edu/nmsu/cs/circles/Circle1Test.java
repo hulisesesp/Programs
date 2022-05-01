@@ -11,6 +11,7 @@ package edu.nmsu.cs.circles;
 
 import org.junit.*;
 
+
 public class Circle1Test
 {
 	// Data you need for each test case
@@ -73,7 +74,7 @@ public class Circle1Test
 	@Test
 	public void simpleScaleDown()
 	{
-		System.out.println("Running test simpleScaleUp.");
+		System.out.println("Running test simpleScaleDown.");
 		circle1.scale(.5);
 		Assert.assertTrue(circle1.radius == 1.5);
 	}
