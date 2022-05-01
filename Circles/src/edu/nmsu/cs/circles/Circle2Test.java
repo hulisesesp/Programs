@@ -11,10 +11,11 @@ package edu.nmsu.cs.circles;
 
 import org.junit.*;
 
-public class Circle1Test
+public class Circle2Test
 {
 	// Data you need for each test case
 	private Circle1 circle1;
+	private Circle2 circle2;
 
 	//
 	// Stuff you want to do before each test case
@@ -22,8 +23,9 @@ public class Circle1Test
 	@Before
 	public void setup()
 	{
-		System.out.println("\nTest starting...");
+		// System.out.println("\nTest starting...");
 		circle1 = new Circle1(1, 2, 3);
+		circle2 = new Circle2(1, 2, 3);
 	}
 
 	//
@@ -32,7 +34,7 @@ public class Circle1Test
 	@After
 	public void teardown()
 	{
-		System.out.println("\nTest finished.");
+		// System.out.println("\nTest finished.");
 	}
 
 	//
@@ -42,8 +44,8 @@ public class Circle1Test
 	public void simpleMove()
 	{
 		Point p;
-		System.out.println("Running test simpleMove.");
-		p = circle1.moveBy(1, 1);
+		// System.out.println("Running test simpleMove.");
+		p = circle2.moveBy(1, 1);
 		Assert.assertTrue(p.x == 2 && p.y == 3);
 	}
 
@@ -54,18 +56,17 @@ public class Circle1Test
 	public void simpleMoveNeg()
 	{
 		Point p;
-		System.out.println("Running test simpleMoveNeg.");
-		p = circle1.moveBy(-1, -1);
+		// System.out.println("Running test simpleMoveNeg.");
+		p = circle2.moveBy(-1, -1);
 		Assert.assertTrue(p.x == 0 && p.y == 1);
 	}
 
-		public void simpleScaleUp()
+	public void simpleScaleUp()
 	{
 		System.out.println("Running test simpleScaleUp.");
-		circle1.scale(2.0);
-		Assert.assertTrue(circle1.radius == 6);
+		circle2.scale(2.0);
+		Assert.assertTrue(circle2.radius == 6);
 	}
-
 
 	//
 	// Test scale down
@@ -74,10 +75,9 @@ public class Circle1Test
 	public void simpleScaleDown()
 	{
 		System.out.println("Running test simpleScaleUp.");
-		circle1.scale(.5);
-		Assert.assertTrue(circle1.radius == 1.5);
+		circle2.scale(.5);
+		Assert.assertTrue(circle2.radius == 1.5);
 	}
-
 
 	//
 	// Test intersects
@@ -85,14 +85,12 @@ public class Circle1Test
 	@Test
 	public void simpleTouching()
 	{
-		//very close circle
-		Circle1 circle1_1; 
-		circle1_1 = new Circle1(3, 2, 3);
+		Circle2 circle2_1; 
+		circle2_1 = new Circle2(3, 2, 3);
 		System.out.println("Running test simpleTouching.");
-		Assert.assertTrue(circle1.intersects(circle1_1));
+		Assert.assertTrue(circle2.intersects(circle2_1));
 
 	}
-
 
 	//
 	// Test out of bounds intersect
@@ -100,14 +98,14 @@ public class Circle1Test
 	@Test
 	public void notTouching()
 	{	
-		Circle1 circle1_1; 
+		Circle2 circle2_1; 
 		//circle out of bounds, by y axis
-		circle1_1 = new Circle1(7, 2, 3);
-		Assert.assertTrue(!circle1.intersects(circle1_1));
+		circle2_1 = new Circle2(7, 2, 3);
+		Assert.assertTrue(!circle2.intersects(circle2_1));
 
 		//circle out of bounds, by x axis
-		circle1_1 = new Circle1(3, 5, 3);
-		Assert.assertTrue(!circle1.intersects(circle1_1));
+		circle2_1 = new Circle2(3, 5, 3);
+		Assert.assertTrue(!circle2.intersects(circle2_1));
 	}
 
 	/***

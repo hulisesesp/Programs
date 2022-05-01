@@ -207,13 +207,13 @@ public class WebWorker implements Runnable{
 	         os.write("HTTP/1.1 404 Not Found\n".getBytes());
 	      }
 	    }else {
-			FileInputStream f = new FileInputStream(reqFile);
-			int j = f.available();
-			//use array to store the data
-			byte[] B = new byte[j];
-			f.read(B);
-			f.close();
-			os.write(B);
+	    		FileInputStream f = new FileInputStream(reqFile);
+	    		int j = f.available();
+	    		//use array to store the data
+	    		byte[] B = new byte[j];
+	    		f.read(B);
+	    		f.close();
+	    		os.write(B);
 	    }
 	    
 
